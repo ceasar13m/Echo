@@ -1,0 +1,31 @@
+{
+  "teachers": [
+
+    {
+      "name": "Sania",
+      "exp": 20,
+      "subject": [
+        "math", "geom"
+      ]
+    },
+
+    {
+      "name": "Ainur",
+      "exp": 5,
+      "subject": [
+        "math", "geom", "inf"
+      ]
+    },
+
+
+    {
+      "name": "Sania",
+      "exp": 20,
+      "subject": [
+        ""
+      ]
+    }
+
+  ]
+}
+
