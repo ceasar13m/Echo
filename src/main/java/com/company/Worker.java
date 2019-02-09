@@ -25,10 +25,9 @@ public class Worker extends Thread {
             message = reader.readLine();
 
             while (true) {
+                System.out.println("Сервер получил команду от клиента " + message);
 
                 if (message.equals("exit")) break;
-
-                System.out.println("Сервер получил команду от клиента " + message);
 
                 writer.write(message);
                 writer.flush();

@@ -16,7 +16,7 @@ public class Teacher {
 
         String subj = "";
         for (int i = 0; i < subject.size(); i++) {
-            subj = subj + ", " +subject.get(i);
+            subj = subj + ", " + subject.get(i);
         }
 
         return name + " " + exp + " " + subj;
