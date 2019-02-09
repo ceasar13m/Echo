@@ -1,31 +1,21 @@
 {
-  "teachers": [
+  "users": [
 
     {
-      "name": "Sania",
-      "exp": 20,
-      "subject": [
-        "math", "geom"
-      ]
+      "login": "ainur",
+      "password": "123"
     },
 
     {
-      "name": "Ainur",
-      "exp": 5,
-      "subject": [
-        "math", "geom", "inf"
-      ]
+      "login": "ildar",
+      "password": "111"
     },
 
 
     {
-      "name": "Sania",
-      "exp": 20,
-      "subject": [
-        ""
-      ]
+      "login": "ilnaz",
+      "password": "132"
     }
-
   ]
 }
 
