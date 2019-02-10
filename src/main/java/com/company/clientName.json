@@ -1,21 +1,11 @@
-{
-  "teachers": [
-
-    {
-      "login": "ainur",
-      "password": "123"
-    },
-
-    {
-      "login": "ildar",
-      "password": "111"
-    },
-
-
-    {
-      "login": "ilnaz",
-      "password": "132"
-    }
-  ]
+{ "users":[
+  {
+    "login": "ilnur",
+    "password": "332"
+  },
+  {
+    "login": "Ilnaz",
+    "password": "123"
+  }
+]
 }
-

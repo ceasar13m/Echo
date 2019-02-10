@@ -1,7 +1,7 @@
 package com.company.model;
 
 
-public class Teacher {
+public class User {
 
 
     public String login;
