@@ -5,8 +5,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server extends Thread{
-    Socket clientSocket;
-    ServerSocket serverSocket;
+
+    private Socket clientSocket;
+    private ServerSocket serverSocket;
+
+    private InMemoryDB inMemoryDB = new InMemoryDB();
 
 
     public void run() {
@@ -21,7 +24,7 @@ public class Server extends Thread{
                     clientSocket = serverSocket.accept();
                     System.out.println("Новый клиент..выделение потока..");
 
-                    Worker serverWorker = new Worker(clientSocket);
+                    Worker serverWorker = new Worker(clientSocket, inMemoryDB);
                     serverWorker.start();
 
                 }

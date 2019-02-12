@@ -30,7 +30,7 @@ public class UserWriter {
 
 
 
-        fileWriter.write(gson.toJson(users.users));
+        fileWriter.write(gson.toJson(users, Users.class));
 
         fileWriter.flush();
         fileWriter.close();
