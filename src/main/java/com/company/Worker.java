@@ -2,6 +2,7 @@ package com.company;
 
 import com.company.model.Good;
 import com.company.model.Response;
+import com.company.model.User;
 import com.google.gson.Gson;
 
 import java.io.*;
@@ -41,27 +42,36 @@ public class Worker extends Thread {
                 String command = parseCommand(message);
                 if (command != null) {
                     switch (command) {
-                        case "signup":
-
+                        case "signup": {
+                            processSignUp(message);
                             break;
+                        }
 
-                        case "signin":
+                        case "signin": {
+                            processSignIn(message);
                             break;
+                        }
 
-                        case "add":
+                        case "add": {
+                            processAdd(message, writer);
                             break;
+                        }
 
-                        case "buy":
+                        case "buy": {
                             break;
+                        }
 
-                        case "getall":
+                        case "getall": {
                             break;
+                        }
 
-                        case "signout":
+                        case "signout": {
                             break;
+                        }
 
-                        default:
+                        default: {
                             break;
+                        }
                     }
                 }
 
@@ -113,7 +123,14 @@ public class Worker extends Thread {
      * Возвращает токен
      * @param url
      */
-    private void processSignIn(String url) {
+    private int processSignIn(String url) {
+        String[] split = url.split("/");
+        if(split.length < 3)
+            return -1;
+        else  {
+            User user = gson.fromJson(split[3], User.class);
+            inMemoryDB.isLoginPasswordValid(user.login, user.password);
+        }
 
     }
 

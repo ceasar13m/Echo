@@ -15,13 +15,13 @@ public class ClientTest {
 
 
     @BeforeClass
-    static void startServer() {
+    public static void startServer() {
         Server server = new Server();
         server.start();
     }
 
     @Test
-    void сlient1() {
+    public void сlient1() {
         Gson gson = new Gson();
 
 
