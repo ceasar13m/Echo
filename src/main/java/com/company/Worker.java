@@ -3,11 +3,14 @@ package com.company;
 import com.company.model.Good;
 import com.company.model.Response;
 import com.company.model.User;
+import com.fasterxml.uuid.UUIDGenerator;
+import com.fasterxml.uuid.UUIDType;
 import com.google.gson.Gson;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.UUID;
 
 public class Worker extends Thread {
 
@@ -15,6 +18,7 @@ public class Worker extends Thread {
     BufferedWriter writer;
     BufferedReader reader;
     private Gson gson;
+    private UUID uuid;
 
     private InMemoryDB inMemoryDB;
 
@@ -48,7 +52,8 @@ public class Worker extends Thread {
                         }
 
                         case "signin": {
-                            processSignIn(message);
+                            writer.write(processSignIn(message));
+                            writer.flush();
                             break;
                         }
 
@@ -123,14 +128,19 @@ public class Worker extends Thread {
      * Возвращает токен
      * @param url
      */
-    private int processSignIn(String url) {
+    private String processSignIn(String url) {
         String[] split = url.split("/");
         if(split.length < 3)
-            return -1;
+            return null;
         else  {
             User user = gson.fromJson(split[3], User.class);
-            inMemoryDB.isLoginPasswordValid(user.login, user.password);
+            if(inMemoryDB.isLoginPasswordValid(user.login, user.password)) {
+                UUID uuid = UUID.fromString(split[3]);
+                inMemoryDB.addToken(uuid.toString());
+                return uuid.toString();
+            }
         }
+        return  null;
 
     }
 

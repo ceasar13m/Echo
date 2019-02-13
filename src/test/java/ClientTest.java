@@ -5,9 +5,7 @@ import com.google.gson.Gson;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -30,10 +28,11 @@ public class ClientTest {
             Scanner scanner = new Scanner(System.in);
 
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-
-
-            String signUpRequest = "/signup/";
+            BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             User user = new User();
+/*
+            String signUpRequest = "/signup/";
+
             user.login = "ainur";
             user.password = "123";
             signUpRequest += gson.toJson(user, User.class);
@@ -43,17 +42,19 @@ public class ClientTest {
             writer.flush();
 
             String signUpResponse = scanner.nextLine();
-            // .... реализовать проверку ответа
-
+            System.out.println(signUpRequest);
+*/
             // ----------------------------------------------------------
 
             String signInRequest = "/signin/";
+            user.login = "ainur";
+            user.password = "123";
             signInRequest += gson.toJson(user, User.class);
             writer.write(signInRequest);
             writer.flush();
 
-            String signInResposnse = scanner.nextLine();
-            // .... реализовать проверку ответа
+            String signInResponse = reader.readLine();
+            System.out.println(signInResponse);
 
             //-----------------------------------------------------------
 
