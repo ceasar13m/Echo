@@ -3,8 +3,7 @@ package com.company;
 import com.company.model.Good;
 import com.company.model.Response;
 import com.company.model.User;
-import com.fasterxml.uuid.UUIDGenerator;
-import com.fasterxml.uuid.UUIDType;
+import com.company.util.HttpStatus;
 import com.google.gson.Gson;
 
 import java.io.*;
@@ -52,8 +51,7 @@ public class Worker extends Thread {
                         }
 
                         case "signin": {
-                            writer.write(processSignIn(message));
-                            writer.flush();
+                            processSignIn(message);
                             break;
                         }
 
@@ -79,9 +77,6 @@ public class Worker extends Thread {
                         }
                     }
                 }
-
-                writer.write(message);
-                writer.flush();
 
                 message = reader.readLine();
             }
@@ -123,47 +118,72 @@ public class Worker extends Thread {
     }
 
     /**
-     * Обращается в базу данных и проверяет логин и пароль.
-     * Если есть такой пользователь возвращает какой-то код в зависимости....
-     * Возвращает токен
-     * @param url
-     */
-    private String processSignIn(String url) {
-        String[] split = url.split("/");
-        if(split.length < 3)
-            return null;
-        else  {
-            User user = gson.fromJson(split[3], User.class);
-            if(inMemoryDB.isLoginPasswordValid(user.login, user.password)) {
-                UUID uuid = UUID.fromString(split[3]);
-                inMemoryDB.addToken(uuid.toString());
-                return uuid.toString();
-            }
-        }
-        return  null;
-
-    }
-
-    /**
      * 1. Проверяет на корректность логина и пароля
      * 2. Не занят ли логин
      * 3. Проводит регистрацию и возвращает токен
      * @param url
      */
-    private void processSignUp(String url) {
+    private void processSignUp(String url) throws IOException {
+        String[] split = url.split("/");
+        if(split.length < 3)
+            responseInvalidArgument(writer);
+        else  {
+            User user = gson.fromJson(split[2], User.class);
+            if(!inMemoryDB.isUserExists(user.login, user.password)) {
+                // все ок, вернуть токен
+                System.out.println("######## => Юзер не существует, проводим регистрацию");
+                UUID uuid = UUID.randomUUID();
+
+                Response response = createResponse(HttpStatus.OK, uuid.toString());
+                String stringResponse = gson.toJson(response, Response.class);
+                stringResponse += "\n";
+                writer.write(stringResponse);
+                writer.flush();
+
+            } else {
+                Response response = createResponse(HttpStatus.FORBIDDEN, "User already exists");
+                String stringResponse = gson.toJson(response, Response.class);
+                writer.write(stringResponse);
+                writer.flush();
+            }
+        }
+    }
+
+
+    /**
+     * Обращается в базу данных и проверяет логин и пароль.
+     * Если есть такой пользователь возвращает какой-то код в зависимости....
+     * Возвращает токен
+     * @param url
+     */
+    private void processSignIn(String url) throws IOException {
+        String[] split = url.split("/");
+        if(split.length < 3) {
+            responseInvalidArgument(writer);
+            return;
+        } else  {
+            User user = gson.fromJson(split[2], User.class);
+            if(inMemoryDB.isLoginPasswordValid(user.login, user.password)) {
+                System.out.println("######## => Корректные ...");
+                UUID uuid = UUID.randomUUID();
+                inMemoryDB.addToken(uuid.toString());
+
+                Response response = createResponse(HttpStatus.OK, uuid.toString());
+                String stringResponse = gson.toJson(response, Response.class);
+                stringResponse += "\n";
+                writer.write(stringResponse);
+                writer.flush();
+            }
+        }
 
     }
+
 
     private void processAdd(String url, BufferedWriter writer) throws IOException {
         String[] ss = url.split("/");
 
         if(ss.length < 4) {
-            Response response = new Response();
-            response.code = 400;
-            response.message = "Invalid arguments in the url";
-
-            writer.write(gson.toJson(response, Response.class));
-            writer.flush();
+            responseInvalidArgument(writer);
             return;
         }
         String token = ss[2];
@@ -174,16 +194,12 @@ public class Worker extends Thread {
             inMemoryDB.addGood(good);
 
             Response response = new Response();
-            response.code = 200;
+            response.code = HttpStatus.OK;
             response.message = "OK";
             writer.write(gson.toJson(response, Response.class));
             writer.flush();
         } else {
-            Response response = new Response();
-            response.code = 403;
-            response.message = "Wrong token. Forbidden.";
-
-            writer.write(gson.toJson(response, Response.class));
+            writer.write(gson.toJson(createResponse(HttpStatus.FORBIDDEN, "Forbidden"), Response.class));
             writer.flush();
         }
     }
@@ -198,5 +214,18 @@ public class Worker extends Thread {
 
     private void processSignOut(String url) {
 
+    }
+
+    private static Response createResponse(int code, String message) {
+        Response response = new Response();
+        response.code = code;
+        response.message = message;
+
+        return response;
+    }
+
+    private void responseInvalidArgument(BufferedWriter writer) throws IOException {
+        writer.write(gson.toJson(createResponse(HttpStatus.BAD_REQUEST, "Invalid argument"), Response.class));
+        writer.flush();
     }
 }

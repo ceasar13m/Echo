@@ -13,17 +13,19 @@ public class Server extends Thread{
 
 
     public void run() {
+        System.out.println("Запуск сервера...");
 
         try {
             try {
-                serverSocket = new ServerSocket(4005);
+                serverSocket = new ServerSocket(8080);
 
                 System.out.println("Сервер запущен...");
 
                 while(true) {
+                    System.out.println("Сервер ожидает новго клиента..");
                     clientSocket = serverSocket.accept();
-                    System.out.println("Новый клиент..выделение потока..");
 
+                    System.out.println("Новый клиент..выделение потока..");
                     Worker serverWorker = new Worker(clientSocket, inMemoryDB);
                     serverWorker.start();
 

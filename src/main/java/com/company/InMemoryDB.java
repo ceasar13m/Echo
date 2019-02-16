@@ -16,12 +16,17 @@ public class InMemoryDB {
 
     private Object object = new Object();
 
+    public boolean isUserExists(String login, String password) {
+        return false;
+    }
+
     public boolean isLoginPasswordValid(String login, String password) {
-        if(authStorage.containsKey(login) && authStorage.get(login).equals(password)) {
-            return true;
-        }
-        else
-            return false;
+        return true;
+//        if(authStorage.containsKey(login) && authStorage.get(login).equals(password)) {
+//            return true;
+//        }
+//        else
+//            return false;
     }
 
     public boolean isTokenValid(String token) {

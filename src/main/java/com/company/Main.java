@@ -14,7 +14,6 @@ public class Main {
         client.start();
 
 
-
         client.join();
         server.join();
     }
