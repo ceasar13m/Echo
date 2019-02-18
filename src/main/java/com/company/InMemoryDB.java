@@ -17,16 +17,21 @@ public class InMemoryDB {
     private Object object = new Object();
 
     public boolean isUserExists(String login, String password) {
-        return false;
+        if (authStorage.containsKey(login)) {
+            return true;
+        } else
+            return false;
     }
 
     public boolean isLoginPasswordValid(String login, String password) {
-        return true;
-//        if(authStorage.containsKey(login) && authStorage.get(login).equals(password)) {
-//            return true;
-//        }
-//        else
-//            return false;
+        System.out.println(authStorage.containsKey("ainur"));
+        if (authStorage.containsKey(login)) {
+            if (authStorage.get(login).equals(password))
+                return true;
+            else
+                return false;
+        } else
+            return false;
     }
 
     public boolean isTokenValid(String token) {
@@ -34,7 +39,7 @@ public class InMemoryDB {
     }
 
     public boolean addUser(User user) {
-        if(authStorage.containsKey(user.login))
+        if (authStorage.containsKey(user.login))
             return false;
         else {
             authStorage.put(user.login, user.password);
@@ -43,7 +48,7 @@ public class InMemoryDB {
     }
 
     public boolean addToken(String token) {
-        if(tokensStorage.containsKey(token)) return false;
+        if (tokensStorage.containsKey(token)) return false;
         tokensStorage.put(token, object);
         return true;
     }

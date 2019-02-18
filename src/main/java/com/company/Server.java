@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Server extends Thread{
+public class Server extends Thread {
 
     private Socket clientSocket;
     private ServerSocket serverSocket;
@@ -21,8 +21,8 @@ public class Server extends Thread{
 
                 System.out.println("Сервер запущен...");
 
-                while(true) {
-                    System.out.println("Сервер ожидает новго клиента..");
+                while (true) {
+                    System.out.println("Сервер ожидает нового клиента..");
                     clientSocket = serverSocket.accept();
 
                     System.out.println("Новый клиент..выделение потока..");
@@ -34,8 +34,7 @@ public class Server extends Thread{
                 serverSocket.close();
                 System.out.println("Сервер закрыт...");
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             System.err.println(e + "error");
         }
 

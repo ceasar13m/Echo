@@ -45,21 +45,21 @@ public class ClientTest {
 
             // Проверка регистрации
             String signUpResponseString = reader.readLine();
-            System.out.println("Получили от сервера после запроса signup"+signUpResponseString);
+            System.out.println("Получили от сервера после запроса signup: " + signUpResponseString);
 
             // ----------------------------------------------------------
 
 
             try {
-                Thread.sleep(100);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
 
             String signInRequest = "/signin/";
-            user.login = "ainur";
-            user.password = "123";
+            user.login = "ilnur";
+            user.password = "324";
             signInRequest += gson.toJson(user, User.class);
             signInRequest += "\n";
             writer.write(signInRequest);
@@ -69,10 +69,10 @@ public class ClientTest {
             // Проверка входа
             // Ожидается токен
             String signInResponseString = reader.readLine();
-            System.out.println("\n\nПолучили от сервера после запроса signin"+signInResponseString+"\n");
+            System.out.println("\n\nПолучили от сервера после запроса signin: " + signInResponseString + "\n");
             Response signInResponse = gson.fromJson(signInResponseString, Response.class);
             String token = signInResponse.message;
-            System.out.println("Token: "+token);
+            System.out.println("Token: " + token);
 
             //-----------------------------------------------------------
 
