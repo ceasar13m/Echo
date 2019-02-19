@@ -146,7 +146,7 @@ public class Worker extends Thread {
             } else {
                 Response response = createResponse(HttpStatus.FORBIDDEN, "User already exists");
                 String stringResponse = gson.toJson(response, Response.class);
-                writer.write(stringResponse);
+                writer.write(stringResponse + "\n");
                 writer.flush();
             }
         }
@@ -167,9 +167,7 @@ public class Worker extends Thread {
             return;
         } else {
             User user = gson.fromJson(split[2], User.class);
-         //   System.out.println(user.login);
             if (inMemoryDB.isLoginPasswordValid(user.login, user.password)) {
-                System.out.println("iffff");
                 System.out.println("######## => Корректные данные входа");
                 UUID uuid = UUID.randomUUID();
                 inMemoryDB.addToken(uuid.toString());
@@ -181,7 +179,6 @@ public class Worker extends Thread {
                 writer.flush();
             }
             else {
-                System.out.println("else");
                 Response response = createResponse(HttpStatus.BAD_REQUEST, "incorrect username or password");
                 String stringResponse = gson.toJson(response, Response.class);
                 stringResponse += "\n";
@@ -210,10 +207,10 @@ public class Worker extends Thread {
             Response response = new Response();
             response.code = HttpStatus.OK;
             response.message = "OK";
-            writer.write(gson.toJson(response, Response.class));
+            writer.write(gson.toJson(response, Response.class) + "\n");
             writer.flush();
         } else {
-            writer.write(gson.toJson(createResponse(HttpStatus.FORBIDDEN, "Forbidden"), Response.class));
+            writer.write(gson.toJson(createResponse(HttpStatus.FORBIDDEN, "Forbidden"), Response.class) + "\n");
             writer.flush();
         }
     }

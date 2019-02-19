@@ -1,5 +1,6 @@
-import com.company.Client;
+
 import com.company.Server;
+import com.company.model.Good;
 import com.company.model.Response;
 import com.company.model.User;
 import com.google.gson.Gson;
@@ -36,7 +37,7 @@ public class ClientTest {
 
             String signUpRequest = "/signup/";
 
-            user.login = "ainur";
+            user.login = "ilnaz";
             user.password = "123";
             signUpRequest += gson.toJson(user, User.class);
             signUpRequest += "\n";
@@ -50,16 +51,25 @@ public class ClientTest {
             // ----------------------------------------------------------
 
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            String signUpRequest2 = "/signup/";
+
+            user.login = "ilnaz";
+            user.password = "123";
+            signUpRequest2 += gson.toJson(user, User.class);
+            signUpRequest2 += "\n";
+            writer.write(signUpRequest2);
+            writer.flush();
+
+            // Проверка регистрации
+            String signUpResponseString2 = reader.readLine();
+            System.out.println("Получили от сервера после запроса signup: " + signUpResponseString2);
+
+            //------------------------------------------------------------
 
 
             String signInRequest = "/signin/";
-            user.login = "ilnur";
-            user.password = "324";
+            user.login = "ilnaz";
+            user.password = "123";
             signInRequest += gson.toJson(user, User.class);
             signInRequest += "\n";
             writer.write(signInRequest);
@@ -78,9 +88,36 @@ public class ClientTest {
 
 
 
+            String addRequest = "/add/";
+            Good good = new Good();
+            good.name = "pizza";
+            good.count = 4;
+            addRequest += token + "/" + gson.toJson(good, Good.class) + "\n";
+            writer.write(addRequest);
+            writer.flush();
 
+            String addResponseString = reader.readLine();
+            System.out.println("От сервера получено после запроса add: " + addResponseString);
+            Response addResponse = gson.fromJson(addResponseString, Response.class);
+
+            //-----------------------------------------------------------------
+
+
+            String addRequest2 = "/add/";
+            Good good2 = new Good();
+            good2.name = "pizza";
+            good2.count = 5;
+            addRequest2 += token + "/" + gson.toJson(good2, Good.class) + "\n";
+            writer.write(addRequest2);
+            writer.flush();
+
+            String addResponseString2 = reader.readLine();
+            System.out.println("От сервера получено после запроса add: " + addResponseString2);
+            Response addResponse2 = gson.fromJson(addResponseString2, Response.class);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 }
+
+

@@ -24,7 +24,6 @@ public class InMemoryDB {
     }
 
     public boolean isLoginPasswordValid(String login, String password) {
-        System.out.println(authStorage.containsKey("ainur"));
         if (authStorage.containsKey(login)) {
             if (authStorage.get(login).equals(password))
                 return true;
@@ -35,6 +34,7 @@ public class InMemoryDB {
     }
 
     public boolean isTokenValid(String token) {
+        System.out.println(tokensStorage.containsKey(token));
         return tokensStorage.containsKey(token);
     }
 
@@ -58,6 +58,12 @@ public class InMemoryDB {
     }
 
     public void addGood(Good good) {
-
+        if(!goodsStorage.containsKey(good.name)) {
+            goodsStorage.put(good.name, good.count);
+        }
+        else {
+            good.count += goodsStorage.get(good.name);
+            goodsStorage.put(good.name, good.count);
+        }
     }
 }
