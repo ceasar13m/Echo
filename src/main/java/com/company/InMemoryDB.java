@@ -48,7 +48,8 @@ public class InMemoryDB {
     }
 
     public boolean addToken(String token) {
-        if (tokensStorage.containsKey(token)) return false;
+        if (tokensStorage.containsKey(token))
+            return false;
         tokensStorage.put(token, object);
         return true;
     }
@@ -57,6 +58,11 @@ public class InMemoryDB {
         tokensStorage.remove(token);
     }
 
+    /**
+     * Если в HashMap нет этого товара, добавляет
+     * Если есть, то увеличивает количество
+     * @param good
+     */
     public void addGood(Good good) {
         if(!goodsStorage.containsKey(good.name)) {
             goodsStorage.put(good.name, good.count);
@@ -64,6 +70,21 @@ public class InMemoryDB {
         else {
             good.count += goodsStorage.get(good.name);
             goodsStorage.put(good.name, good.count);
+        }
+    }
+
+    /**
+     *
+     * @param good
+     * @return
+     */
+    public boolean buyGood(Good good) {
+        if(goodsStorage.containsKey(good.name) && goodsStorage.get(good.name) >= good.count) {
+            good.count -= goodsStorage.put(good.name, good.count);
+            return true;
+        }
+        else {
+            return false;
         }
     }
 }

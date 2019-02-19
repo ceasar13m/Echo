@@ -61,6 +61,7 @@ public class Worker extends Thread {
                         }
 
                         case "buy": {
+                            processBuy(message);
                             break;
                         }
 
@@ -215,11 +216,40 @@ public class Worker extends Thread {
         }
     }
 
-    private void processBuy(String url) {
+    private void processBuy(String url) throws IOException {
+        String[] ss = url.split("/");
 
+        if (ss.length < 4) {
+            responseInvalidArgument(writer);
+            return;
+        }
+        String token = ss[2];
+        String jsonString = ss[3];
+
+        if (inMemoryDB.isTokenValid(token)) {
+            Good good = gson.fromJson(jsonString, Good.class);
+            if(inMemoryDB.buyGood(good)) {
+                Response response = new Response();
+                response.code = HttpStatus.OK;
+                response.message = "OK";
+                writer.write(gson.toJson(response, Response.class) + "\n");
+                writer.flush();
+            }else {
+                Response response = new Response();
+                response.code = HttpStatus.FORBIDDEN;
+                response.message = "Unfortunately this item is not available at the moment";
+                writer.write(gson.toJson(response, Response.class) + "\n");
+                writer.flush();
+            }
+
+        } else {
+            writer.write(gson.toJson(createResponse(HttpStatus.FORBIDDEN, "Forbidden"), Response.class) + "\n");
+            writer.flush();
+        }
     }
 
     private void processGetAll(String url) {
+
 
     }
 

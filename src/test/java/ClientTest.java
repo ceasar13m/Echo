@@ -114,6 +114,20 @@ public class ClientTest {
             String addResponseString2 = reader.readLine();
             System.out.println("От сервера получено после запроса add: " + addResponseString2);
             Response addResponse2 = gson.fromJson(addResponseString2, Response.class);
+
+
+            //--------------------------------------------------------------------
+
+            String buyRequest = "/buy/";
+            good.name = "pizza";
+            good.count = 11;
+            buyRequest += token + "/" + gson.toJson(good, Good.class) + "\n";
+            writer.write(buyRequest);
+            writer.flush();
+
+            String buyResponseString = reader.readLine();
+            System.out.println("От сервера получено после запроса buy: " + buyResponseString);
+            Response buyResponse = gson.fromJson(buyResponseString, Response.class);
         } catch (IOException e) {
             e.printStackTrace();
         }
