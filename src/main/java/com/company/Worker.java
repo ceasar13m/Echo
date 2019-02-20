@@ -66,10 +66,12 @@ public class Worker extends Thread {
                         }
 
                         case "getall": {
+                            processGetAll();
                             break;
                         }
 
                         case "signout": {
+                            processSignOut(message);
                             break;
                         }
 
@@ -248,13 +250,26 @@ public class Worker extends Thread {
         }
     }
 
-    private void processGetAll(String url) {
-
-
+    private void processGetAll() throws IOException {
+        writer.write(inMemoryDB.goodList()+ "\n");
+        writer.flush();
     }
 
-    private void processSignOut(String url) {
-
+    private void processSignOut(String url) throws IOException {
+        String[] split = url.split("/");
+        if (split.length < 3) {
+            responseInvalidArgument(writer);
+            return;
+        } else {
+            if(inMemoryDB.isTokenValid(split[2])) {
+                inMemoryDB.removeToken(split[2]);
+                Response response = new Response();
+                response.code = HttpStatus.OK;
+                response.message = "OK";
+                writer.write(gson.toJson(response, Response.class) + "\n");
+                writer.flush();
+            }
+        }
     }
 
     private static Response createResponse(int code, String message) {

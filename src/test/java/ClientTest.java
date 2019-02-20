@@ -46,7 +46,7 @@ public class ClientTest {
 
             // Проверка регистрации
             String signUpResponseString = reader.readLine();
-            System.out.println("Получили от сервера после запроса signup: " + signUpResponseString);
+            System.out.println("Получили от сервера после запроса signup: " + signUpResponseString +"\n");
 
             // ----------------------------------------------------------
 
@@ -62,7 +62,7 @@ public class ClientTest {
 
             // Проверка регистрации
             String signUpResponseString2 = reader.readLine();
-            System.out.println("Получили от сервера после запроса signup: " + signUpResponseString2);
+            System.out.println("Получили от сервера после запроса signup: " + signUpResponseString2 +"\n");
 
             //------------------------------------------------------------
 
@@ -87,7 +87,6 @@ public class ClientTest {
             //-----------------------------------------------------------
 
 
-
             String addRequest = "/add/";
             Good good = new Good();
             good.name = "pizza";
@@ -97,7 +96,7 @@ public class ClientTest {
             writer.flush();
 
             String addResponseString = reader.readLine();
-            System.out.println("От сервера получено после запроса add: " + addResponseString);
+            System.out.println("От сервера получено после запроса add: " + addResponseString +"\n");
             Response addResponse = gson.fromJson(addResponseString, Response.class);
 
             //-----------------------------------------------------------------
@@ -105,14 +104,14 @@ public class ClientTest {
 
             String addRequest2 = "/add/";
             Good good2 = new Good();
-            good2.name = "pizza";
+            good2.name = "coffee";
             good2.count = 5;
             addRequest2 += token + "/" + gson.toJson(good2, Good.class) + "\n";
             writer.write(addRequest2);
             writer.flush();
 
             String addResponseString2 = reader.readLine();
-            System.out.println("От сервера получено после запроса add: " + addResponseString2);
+            System.out.println("От сервера получено после запроса add: " + addResponseString2 + "\n");
             Response addResponse2 = gson.fromJson(addResponseString2, Response.class);
 
 
@@ -126,8 +125,42 @@ public class ClientTest {
             writer.flush();
 
             String buyResponseString = reader.readLine();
-            System.out.println("От сервера получено после запроса buy: " + buyResponseString);
+            System.out.println("От сервера получено после запроса buy: " + buyResponseString + "\n");
             Response buyResponse = gson.fromJson(buyResponseString, Response.class);
+
+            //------------------------------------------------------------------------
+
+            String getAllRequest = "/getall/";
+            writer.write(getAllRequest + "\n");
+            writer.flush();
+
+            String getAllResponseString = reader.readLine();
+            System.out.println("От сервера получено после запроса getAll: " + getAllResponseString + "\n");
+
+            //------------------------------------------------------------------------------
+
+            String signOutRequest = "/signout/";
+            signOutRequest += token;
+            writer.write(signOutRequest + "\n");
+            writer.flush();
+            String signOutResponseString = reader.readLine();
+            System.out.println("От сервера получено после запроса signout: " + signOutResponseString + "\n");
+
+            //---------------------------------------------------------------------------------
+
+            String addRequest3 = "/add/";
+            Good good3 = new Good();
+            good3.name = "coffee";
+            good3.count = 5;
+            addRequest3 += token + "/" + gson.toJson(good3, Good.class) + "\n";
+            writer.write(addRequest3);
+            writer.flush();
+
+            String addResponseString3 = reader.readLine();
+            System.out.println("От сервера получено после запроса add: " + addResponseString3 + "\n");
+            Response addResponse3 = gson.fromJson(addResponseString3, Response.class);
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -2,7 +2,9 @@ package com.company;
 
 import com.company.model.Good;
 import com.company.model.User;
+import com.google.gson.Gson;
 
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryDB {
@@ -34,7 +36,6 @@ public class InMemoryDB {
     }
 
     public boolean isTokenValid(String token) {
-        System.out.println(tokensStorage.containsKey(token));
         return tokensStorage.containsKey(token);
     }
 
@@ -86,5 +87,20 @@ public class InMemoryDB {
         else {
             return false;
         }
+    }
+
+    public String goodList() {
+        Gson gson = new Gson();
+        Good good = new Good();
+        String jsonString = "";
+        for (String string: goodsStorage.keySet()){
+            String key = string.toString();
+            int value = goodsStorage.get(key);
+            good.name = key;
+            good.count = value;
+
+             jsonString += gson.toJson(good, Good.class);
+        }
+        return jsonString;
     }
 }
