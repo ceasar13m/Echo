@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.UUID;
 
 public class Worker extends Thread {
@@ -20,10 +21,12 @@ public class Worker extends Thread {
     private UUID uuid;
 
     private InMemoryDB inMemoryDB;
+    private DBWorker dbWorker;
 
-    public Worker(Socket socket, InMemoryDB inMemoryDB) {
+    public Worker(Socket socket, InMemoryDB inMemoryDB, DBWorker dbWorker) {
         this.socket = socket;
         this.inMemoryDB = inMemoryDB;
+        this.dbWorker = dbWorker;
     }
 
     @Override
@@ -87,6 +90,8 @@ public class Worker extends Thread {
 
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
         } finally {
             try {
 
@@ -127,23 +132,22 @@ public class Worker extends Thread {
      *
      * @param url
      */
-    private void processSignUp(String url) throws IOException {
+    private void processSignUp(String url) throws IOException, SQLException {
         String[] split = url.split("/");
         if (split.length < 3)
             responseInvalidArgument(writer);
         else {
             User user = gson.fromJson(split[2], User.class);
-            if (!inMemoryDB.isUserExists(user.login, user.password)) {
+            if (!dbWorker.isUserExists(user.login, user.password)) {
                 // все ок, вернуть токен
                 System.out.println("######## => Проводим регистрацию");
                 UUID uuid = UUID.randomUUID();
                 inMemoryDB.addToken(uuid.toString());
-                inMemoryDB.addUser(user);
+                dbWorker.addUser(user);
 
                 Response response = createResponse(HttpStatus.OK, uuid.toString());
                 String stringResponse = gson.toJson(response, Response.class);
-                stringResponse += "\n";
-                writer.write(stringResponse);
+                writer.write(stringResponse + "\n");
                 writer.flush();
 
             } else {
@@ -163,14 +167,14 @@ public class Worker extends Thread {
      *
      * @param url
      */
-    private void processSignIn(String url) throws IOException {
+    private void processSignIn(String url) throws IOException, SQLException {
         String[] split = url.split("/");
         if (split.length < 3) {
             responseInvalidArgument(writer);
             return;
         } else {
             User user = gson.fromJson(split[2], User.class);
-            if (inMemoryDB.isLoginPasswordValid(user.login, user.password)) {
+            if (dbWorker.isLoginPasswordValid(user.login, user.password)) {
                 System.out.println("######## => Корректные данные входа");
                 UUID uuid = UUID.randomUUID();
                 inMemoryDB.addToken(uuid.toString());

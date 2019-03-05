@@ -37,7 +37,7 @@ public class ClientTest {
 
             String signUpRequest = "/signup/";
 
-            user.login = "ilnaz";
+            user.login = "ainur";
             user.password = "123";
             signUpRequest += gson.toJson(user, User.class);
             signUpRequest += "\n";
