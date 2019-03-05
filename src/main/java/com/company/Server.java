@@ -10,7 +10,6 @@ public class Server extends Thread {
     private ServerSocket serverSocket;
 
     private InMemoryDB inMemoryDB = new InMemoryDB();
-    private DBWorker dbWorker= new DBWorker();
 
 
     public void run() {
@@ -27,7 +26,7 @@ public class Server extends Thread {
                     clientSocket = serverSocket.accept();
 
                     System.out.println("Новый клиент..выделение потока..");
-                    Worker serverWorker = new Worker(clientSocket, inMemoryDB, dbWorker);
+                    Worker serverWorker = new Worker(clientSocket, inMemoryDB);
                     serverWorker.start();
                 }
             } finally {
