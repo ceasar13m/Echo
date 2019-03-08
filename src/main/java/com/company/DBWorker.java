@@ -1,6 +1,8 @@
 package com.company;
 
+import com.company.model.Good;
 import com.company.model.User;
+import com.google.gson.Gson;
 
 import java.sql.*;
 
@@ -82,5 +84,72 @@ public class DBWorker {
             statement.executeUpdate(userInsertString);
             return true;
         }
+    }
+
+
+    //-----------------------------------------------------------------------------------------
+
+    public void addGood(Good good) throws SQLException {
+
+        Statement statement = connection.createStatement();
+
+        statement.executeUpdate("use db");
+
+        String tempString = "select * from goods where name = '" + good.name + "';";
+        ResultSet resultSet = statement.executeQuery(tempString);
+
+        if(!resultSet.next()) {
+            String goodInsertString = "insert into goods (name, count) values ('" + good.name + "', " + good.count + ");";
+            statement.executeUpdate(goodInsertString);
+        }
+        else {
+            int sum = resultSet.getInt(2) + good.count;
+            String goodInsertString = "update goods set count = " + sum + " where name = '" + good.name + "';";
+            statement.executeUpdate(goodInsertString);
+        }
+    }
+
+    //----------------------------------------------------------------------------------------
+
+    public boolean buyGood(Good good) throws SQLException {
+        Statement statement = connection.createStatement();
+
+        statement.executeUpdate("use db");
+
+        String tempString = "select * from goods where name = '" + good.name + "'";
+        ResultSet resultSet = statement.executeQuery(tempString);
+
+        if(resultSet.next()) {
+            if(resultSet.getInt(2) >= good.count) {
+                int diff = resultSet.getInt(2) - good.count;
+                String goodInsertString = "update goods set count = " + diff + " where name = '" + good.name + "';";
+                statement.executeUpdate(goodInsertString);
+                return true;
+            }
+            else
+                return false;
+        }
+        else {
+            return false;
+        }
+    }
+
+
+    public String goodList() throws SQLException {
+        Gson gson = new Gson();
+        Good good = new Good();
+
+        Statement statement = connection.createStatement();
+        statement.executeUpdate("use db");
+        String tempString = "select * from goods";
+        ResultSet resultSet = statement.executeQuery(tempString);
+        String jsonString = "";
+        while(resultSet.next()) {
+            good.name = resultSet.getString(1);
+            good.count = resultSet.getInt(2);
+            jsonString += gson.toJson(good, Good.class);
+        }
+
+        return jsonString;
     }
 }

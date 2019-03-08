@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.UUID;
 
 public class Worker extends Thread {
@@ -20,10 +21,12 @@ public class Worker extends Thread {
     private UUID uuid;
 
     private InMemoryDB inMemoryDB;
+    private DBWorker dbWorker;
 
-    public Worker(Socket socket, InMemoryDB inMemoryDB) {
+    public Worker(Socket socket, InMemoryDB inMemoryDB, DBWorker dbWorker) {
         this.socket = socket;
         this.inMemoryDB = inMemoryDB;
+        this.dbWorker = dbWorker;
     }
 
     @Override
@@ -86,6 +89,8 @@ public class Worker extends Thread {
 
 
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             try {
@@ -193,7 +198,7 @@ public class Worker extends Thread {
     }
 
 
-    private void processAdd(String url, BufferedWriter writer) throws IOException {
+    private void processAdd(String url, BufferedWriter writer) throws IOException, SQLException {
         String[] ss = url.split("/");
 
         if (ss.length < 4) {
@@ -205,8 +210,8 @@ public class Worker extends Thread {
 
         if (inMemoryDB.isTokenValid(token)) {
             Good good = gson.fromJson(jsonString, Good.class);
-            inMemoryDB.addGood(good);
 
+            dbWorker.addGood(good);
             Response response = new Response();
             response.code = HttpStatus.OK;
             response.message = "OK";
@@ -218,7 +223,7 @@ public class Worker extends Thread {
         }
     }
 
-    private void processBuy(String url) throws IOException {
+    private void processBuy(String url) throws IOException, SQLException {
         String[] ss = url.split("/");
 
         if (ss.length < 4) {
@@ -230,7 +235,7 @@ public class Worker extends Thread {
 
         if (inMemoryDB.isTokenValid(token)) {
             Good good = gson.fromJson(jsonString, Good.class);
-            if(inMemoryDB.buyGood(good)) {
+            if(dbWorker.buyGood(good)) {
                 Response response = new Response();
                 response.code = HttpStatus.OK;
                 response.message = "OK";
@@ -239,7 +244,7 @@ public class Worker extends Thread {
             }else {
                 Response response = new Response();
                 response.code = HttpStatus.FORBIDDEN;
-                response.message = "Unfortunately this item is not available at the moment";
+                response.message = "Forbidden";
                 writer.write(gson.toJson(response, Response.class) + "\n");
                 writer.flush();
             }
@@ -250,8 +255,8 @@ public class Worker extends Thread {
         }
     }
 
-    private void processGetAll() throws IOException {
-        writer.write(inMemoryDB.goodList()+ "\n");
+    private void processGetAll() throws IOException, SQLException {
+        writer.write(dbWorker.goodList()+ "\n");
         writer.flush();
     }
 

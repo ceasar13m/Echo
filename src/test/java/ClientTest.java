@@ -118,8 +118,8 @@ public class ClientTest {
             //--------------------------------------------------------------------
 
             String buyRequest = "/buy/";
-            good.name = "pizza";
-            good.count = 11;
+            good.name = "coffee";
+            good.count = 2;
             buyRequest += token + "/" + gson.toJson(good, Good.class) + "\n";
             writer.write(buyRequest);
             writer.flush();
