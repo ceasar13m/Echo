@@ -27,7 +27,6 @@ public class ClientTest {
 
         try {
             Socket clientSocket = new Socket("localhost", 8080);
-            Scanner scanner = new Scanner(System.in);
 
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
             BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -53,8 +52,8 @@ public class ClientTest {
 
             String signUpRequest2 = "/signup/";
 
-            user.login = "ilnaz";
-            user.password = "123";
+            user.login = "ildar";
+            user.password = "321";
             signUpRequest2 += gson.toJson(user, User.class);
             signUpRequest2 += "\n";
             writer.write(signUpRequest2);
@@ -68,8 +67,8 @@ public class ClientTest {
 
 
             String signInRequest = "/signin/";
-            user.login = "ilnaz";
-            user.password = "123";
+            user.login = "ildar";
+            user.password = "321";
             signInRequest += gson.toJson(user, User.class);
             signInRequest += "\n";
             writer.write(signInRequest);

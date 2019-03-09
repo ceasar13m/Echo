@@ -98,20 +98,21 @@ public class MySQLRepositoryImplementation implements Repository{
     @Override
     public boolean addUser(User user){
 
-        Statement statement;
+        PreparedStatement preparedStatement;
         try {
-            statement = connection.createStatement();
-            statement.executeUpdate("use db");
+            preparedStatement = connection.prepareStatement("use db");
 
-            String tempString = "select * from users where username = '" + user.login + "'";
-            ResultSet resultSet = statement.executeQuery(tempString);
+            preparedStatement = connection.prepareStatement("select * from users where username = ?");
+            preparedStatement.setString(1, user.login);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             if(resultSet.next()) {
                 return false;
             }
             else {
-                String userInsertString = "insert into users (username, password) values ('" + user.login + "','" + user.password + "');";
-                statement.executeUpdate(userInsertString);
+                preparedStatement = connection.prepareStatement("insert into users (username, password) values (?, ?);");
+                preparedStatement.setString(1, user.login);
+                preparedStatement.setString(1, user.password);
                 return true;
             }
         } catch (SQLException e) {
@@ -182,6 +183,8 @@ public class MySQLRepositoryImplementation implements Repository{
 
         return false;
     }
+
+    //------------------------------------------------------------------------------------------
 
 
     @Override
