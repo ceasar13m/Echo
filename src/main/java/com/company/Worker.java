@@ -7,7 +7,6 @@ import com.company.util.HttpStatus;
 import com.google.gson.Gson;
 
 import java.io.*;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -18,15 +17,16 @@ public class Worker extends Thread {
     BufferedWriter writer;
     BufferedReader reader;
     private Gson gson;
-    private UUID uuid;
 
-    private InMemoryDB inMemoryDB;
-    private DBWorker dbWorker;
 
-    public Worker(Socket socket, InMemoryDB inMemoryDB, DBWorker dbWorker) {
+
+    Repository repositoryMySQL;
+    Repository repositoryInMemory;
+
+    public Worker(Socket socket) {
         this.socket = socket;
-        this.inMemoryDB = inMemoryDB;
-        this.dbWorker = dbWorker;
+        repositoryInMemory = new InMemoryRepositoryImplementation();
+        repositoryMySQL = new MySQLRepositoryImplementation();
     }
 
     @Override
@@ -90,8 +90,6 @@ public class Worker extends Thread {
 
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
         } finally {
             try {
 
@@ -138,12 +136,12 @@ public class Worker extends Thread {
             responseInvalidArgument(writer);
         else {
             User user = gson.fromJson(split[2], User.class);
-            if (!inMemoryDB.isUserExists(user.login, user.password)) {
+            if (!repositoryInMemory.isUserExists(user.login, user.password)) {
                 // все ок, вернуть токен
                 System.out.println("######## => Проводим регистрацию");
                 UUID uuid = UUID.randomUUID();
-                inMemoryDB.addToken(uuid.toString());
-                inMemoryDB.addUser(user);
+                repositoryInMemory.addToken(uuid.toString());
+                repositoryMySQL.addUser(user);
 
                 Response response = createResponse(HttpStatus.OK, uuid.toString());
                 String stringResponse = gson.toJson(response, Response.class);
@@ -175,10 +173,10 @@ public class Worker extends Thread {
             return;
         } else {
             User user = gson.fromJson(split[2], User.class);
-            if (inMemoryDB.isLoginPasswordValid(user.login, user.password)) {
+            if (repositoryMySQL.isLoginPasswordValid(user.login, user.password)) {
                 System.out.println("######## => Корректные данные входа");
                 UUID uuid = UUID.randomUUID();
-                inMemoryDB.addToken(uuid.toString());
+                repositoryInMemory.addToken(uuid.toString());
 
                 Response response = createResponse(HttpStatus.OK, uuid.toString());
                 String stringResponse = gson.toJson(response, Response.class);
@@ -198,7 +196,7 @@ public class Worker extends Thread {
     }
 
 
-    private void processAdd(String url, BufferedWriter writer) throws IOException, SQLException {
+    private void processAdd(String url, BufferedWriter writer) throws IOException {
         String[] ss = url.split("/");
 
         if (ss.length < 4) {
@@ -208,10 +206,10 @@ public class Worker extends Thread {
         String token = ss[2];
         String jsonString = ss[3];
 
-        if (inMemoryDB.isTokenValid(token)) {
+        if (repositoryInMemory.isTokenValid(token)) {
             Good good = gson.fromJson(jsonString, Good.class);
 
-            dbWorker.addGood(good);
+            repositoryMySQL.addGood(good);
             Response response = new Response();
             response.code = HttpStatus.OK;
             response.message = "OK";
@@ -223,7 +221,7 @@ public class Worker extends Thread {
         }
     }
 
-    private void processBuy(String url) throws IOException, SQLException {
+    private void processBuy(String url) throws IOException {
         String[] ss = url.split("/");
 
         if (ss.length < 4) {
@@ -233,9 +231,9 @@ public class Worker extends Thread {
         String token = ss[2];
         String jsonString = ss[3];
 
-        if (inMemoryDB.isTokenValid(token)) {
+        if (repositoryInMemory.isTokenValid(token)) {
             Good good = gson.fromJson(jsonString, Good.class);
-            if(dbWorker.buyGood(good)) {
+            if(repositoryMySQL.buyGood(good)) {
                 Response response = new Response();
                 response.code = HttpStatus.OK;
                 response.message = "OK";
@@ -255,8 +253,8 @@ public class Worker extends Thread {
         }
     }
 
-    private void processGetAll() throws IOException, SQLException {
-        writer.write(dbWorker.goodList()+ "\n");
+    private void processGetAll() throws IOException {
+        writer.write(repositoryMySQL.goodList()+ "\n");
         writer.flush();
     }
 
@@ -266,8 +264,8 @@ public class Worker extends Thread {
             responseInvalidArgument(writer);
             return;
         } else {
-            if(inMemoryDB.isTokenValid(split[2])) {
-                inMemoryDB.removeToken(split[2]);
+            if(repositoryInMemory.isTokenValid(split[2])) {
+                repositoryInMemory.removeToken(split[2]);
                 Response response = new Response();
                 response.code = HttpStatus.OK;
                 response.message = "OK";
