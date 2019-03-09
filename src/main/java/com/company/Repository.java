@@ -10,10 +10,4 @@ public interface Repository {
     public String goodList();
     public boolean isLoginPasswordValid(String login, String password);
     public boolean isUserExists(String login, String password);
-
-    boolean addToken(String toString);
-
-    boolean isTokenValid(String token);
-
-    void removeToken(String s);
 }

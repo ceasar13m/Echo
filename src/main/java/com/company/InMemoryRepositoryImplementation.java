@@ -10,12 +10,11 @@ public class InMemoryRepositoryImplementation implements Repository{
 
     // Потокобезопасность
     private ConcurrentHashMap<String, String> authStorage = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, Object> tokensStorage = new ConcurrentHashMap<>();
 
     //  Товары ищем по названию
     private ConcurrentHashMap<String, Integer> goodsStorage = new ConcurrentHashMap<>();
 
-    private Object object = new Object();
+
 
     @Override
     public boolean isUserExists(String login, String password) {
@@ -24,6 +23,7 @@ public class InMemoryRepositoryImplementation implements Repository{
         } else
             return false;
     }
+
 
     @Override
     public boolean isLoginPasswordValid(String login, String password) {
@@ -36,22 +36,10 @@ public class InMemoryRepositoryImplementation implements Repository{
             return false;
     }
 
-    public boolean isTokenValid(String token) {
-        return tokensStorage.containsKey(token);
-    }
 
 
 
-    public boolean addToken(String token) {
-        if (tokensStorage.containsKey(token))
-            return false;
-        tokensStorage.put(token, object);
-        return true;
-    }
 
-    public void removeToken(String token) {
-        tokensStorage.remove(token);
-    }
 
 
     @Override

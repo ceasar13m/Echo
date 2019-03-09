@@ -51,21 +51,6 @@ public class MySQLRepositoryImplementation implements Repository{
 
     }
 
-    @Override
-    public boolean addToken(String toString) {
-        return false;
-    }
-
-    @Override
-    public boolean isTokenValid(String token) {
-        return false;
-    }
-
-    @Override
-    public void removeToken(String s) {
-
-    }
-
 
     //------------------------------------------------------------------------------------------
 
@@ -93,26 +78,26 @@ public class MySQLRepositoryImplementation implements Repository{
 
     }
 
+    //----------------------------------------------------------------------------------------------
 
 
     @Override
     public boolean addUser(User user){
 
-        PreparedStatement preparedStatement;
+        Statement statement;
         try {
-            preparedStatement = connection.prepareStatement("use db");
+            statement = connection.createStatement();
+            statement.executeUpdate("use db");
 
-            preparedStatement = connection.prepareStatement("select * from users where username = ?");
-            preparedStatement.setString(1, user.login);
-            ResultSet resultSet = preparedStatement.executeQuery();
+            String tempString = "select * from users where username = '" + user.login + "'";
+            ResultSet resultSet = statement.executeQuery(tempString);
 
             if(resultSet.next()) {
                 return false;
             }
             else {
-                preparedStatement = connection.prepareStatement("insert into users (username, password) values (?, ?);");
-                preparedStatement.setString(1, user.login);
-                preparedStatement.setString(1, user.password);
+                String userInsertString = "insert into users (username, password) values ('" + user.login + "','" + user.password + "');";
+                statement.executeUpdate(userInsertString);
                 return true;
             }
         } catch (SQLException e) {

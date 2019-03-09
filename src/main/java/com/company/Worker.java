@@ -8,7 +8,6 @@ import com.google.gson.Gson;
 
 import java.io.*;
 import java.net.Socket;
-import java.sql.SQLException;
 import java.util.UUID;
 
 public class Worker extends Thread {
@@ -20,13 +19,13 @@ public class Worker extends Thread {
 
 
 
-    Repository repositoryMySQL;
-    Repository repositoryInMemory;
+    Repository repository;
+    TokensStorage tokensStorage;
 
     public Worker(Socket socket) {
         this.socket = socket;
-        repositoryInMemory = new InMemoryRepositoryImplementation();
-        repositoryMySQL = new MySQLRepositoryImplementation();
+        repository = new MySQLRepositoryImplementation();
+        tokensStorage = new TokensStorage();
     }
 
     @Override
@@ -136,12 +135,12 @@ public class Worker extends Thread {
             responseInvalidArgument(writer);
         else {
             User user = gson.fromJson(split[2], User.class);
-            if (!repositoryInMemory.isUserExists(user.login, user.password)) {
+            if (!repository.isUserExists(user.login, user.password)) {
                 // все ок, вернуть токен
                 System.out.println("######## => Проводим регистрацию");
                 UUID uuid = UUID.randomUUID();
-                repositoryInMemory.addToken(uuid.toString());
-                repositoryMySQL.addUser(user);
+                tokensStorage.addToken(uuid.toString());
+                repository.addUser(user);
 
                 Response response = createResponse(HttpStatus.OK, uuid.toString());
                 String stringResponse = gson.toJson(response, Response.class);
@@ -173,10 +172,10 @@ public class Worker extends Thread {
             return;
         } else {
             User user = gson.fromJson(split[2], User.class);
-            if (repositoryMySQL.isLoginPasswordValid(user.login, user.password)) {
+            if (repository.isLoginPasswordValid(user.login, user.password)) {
                 System.out.println("######## => Корректные данные входа");
                 UUID uuid = UUID.randomUUID();
-                repositoryInMemory.addToken(uuid.toString());
+                tokensStorage.addToken(uuid.toString());
 
                 Response response = createResponse(HttpStatus.OK, uuid.toString());
                 String stringResponse = gson.toJson(response, Response.class);
@@ -206,10 +205,10 @@ public class Worker extends Thread {
         String token = ss[2];
         String jsonString = ss[3];
 
-        if (repositoryInMemory.isTokenValid(token)) {
+        if (tokensStorage.isTokenValid(token)) {
             Good good = gson.fromJson(jsonString, Good.class);
 
-            repositoryMySQL.addGood(good);
+            repository.addGood(good);
             Response response = new Response();
             response.code = HttpStatus.OK;
             response.message = "OK";
@@ -231,9 +230,9 @@ public class Worker extends Thread {
         String token = ss[2];
         String jsonString = ss[3];
 
-        if (repositoryInMemory.isTokenValid(token)) {
+        if (tokensStorage.isTokenValid(token)) {
             Good good = gson.fromJson(jsonString, Good.class);
-            if(repositoryMySQL.buyGood(good)) {
+            if(repository.buyGood(good)) {
                 Response response = new Response();
                 response.code = HttpStatus.OK;
                 response.message = "OK";
@@ -254,7 +253,7 @@ public class Worker extends Thread {
     }
 
     private void processGetAll() throws IOException {
-        writer.write(repositoryMySQL.goodList()+ "\n");
+        writer.write(repository.goodList()+ "\n");
         writer.flush();
     }
 
@@ -264,8 +263,8 @@ public class Worker extends Thread {
             responseInvalidArgument(writer);
             return;
         } else {
-            if(repositoryInMemory.isTokenValid(split[2])) {
-                repositoryInMemory.removeToken(split[2]);
+            if(tokensStorage.isTokenValid(split[2])) {
+                tokensStorage.removeToken(split[2]);
                 Response response = new Response();
                 response.code = HttpStatus.OK;
                 response.message = "OK";
