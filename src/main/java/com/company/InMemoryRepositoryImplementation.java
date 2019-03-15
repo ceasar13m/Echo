@@ -77,7 +77,8 @@ public class InMemoryRepositoryImplementation implements Repository{
     @Override
     public boolean buyGood(Good good) {
         if(goodsStorage.containsKey(good.name) && goodsStorage.get(good.name) >= good.count) {
-            good.count -= goodsStorage.put(good.name, good.count);
+            good.count = goodsStorage.get(good.name) - good.count;
+            goodsStorage.put(good.name, good.count);
             return true;
         }
         else {

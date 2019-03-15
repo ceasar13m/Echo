@@ -1,4 +1,5 @@
 
+import com.company.GoodsServlet;
 import com.company.Server;
 import com.company.model.Good;
 import com.company.model.Response;
@@ -9,7 +10,6 @@ import org.junit.Test;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Scanner;
 
 public class ClientTest {
 
@@ -48,6 +48,10 @@ public class ClientTest {
             System.out.println("Получили от сервера после запроса signup: " + signUpResponseString +"\n");
 
             // ----------------------------------------------------------
+
+
+
+            //------------------------------------------------------------
 
 
             String signUpRequest2 = "/signup/";

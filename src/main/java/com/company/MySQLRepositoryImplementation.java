@@ -193,9 +193,7 @@ public class MySQLRepositoryImplementation implements Repository{
             return jsonString;
         } catch (SQLException e) {
             e.printStackTrace();
+            return null;
         }
-
-        return null;
-
     }
 }
