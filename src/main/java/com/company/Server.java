@@ -9,9 +9,6 @@ public class Server extends Thread {
     private Socket clientSocket;
     private ServerSocket serverSocket;
 
-    private InMemoryRepositoryImplementation inMemoryDB = new InMemoryRepositoryImplementation();
-    private MySQLRepositoryImplementation dbWorker = new MySQLRepositoryImplementation();
-
 
     public void run() {
         System.out.println("Запуск сервера...");

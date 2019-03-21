@@ -87,7 +87,7 @@ public class InMemoryRepositoryImplementation implements Repository{
     }
 
     @Override
-    public String goodList() {
+    public String getAllGoods() {
         Gson gson = new Gson();
         Good good = new Good();
         String jsonString = "";

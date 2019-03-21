@@ -10,11 +10,11 @@ public class Main {
         Server server = new Server();
         server.start();
 
-        Client client = new Client();
-        client.start();
+      //  Client client = new Client();
+      //  client.start();
 
 
-        client.join();
+        //client.join();
         server.join();
     }
 }

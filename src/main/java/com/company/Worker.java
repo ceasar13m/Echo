@@ -28,6 +28,7 @@ public class Worker extends Thread {
         tokensStorage = new TokensStorage();
     }
 
+
     @Override
     public void run() {
         System.out.println("Старт нового потока для клиента..");
@@ -253,7 +254,7 @@ public class Worker extends Thread {
     }
 
     private void processGetAll() throws IOException {
-        writer.write(repository.goodList()+ "\n");
+        writer.write(repository.getAllGoods()+ "\n");
         writer.flush();
     }
 

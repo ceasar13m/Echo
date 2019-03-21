@@ -7,7 +7,7 @@ public interface Repository {
     public boolean addUser(User user);
     public void addGood(Good good);
     public boolean buyGood(Good good);
-    public String goodList();
+    public String getAllGoods();
     public boolean isLoginPasswordValid(String login, String password);
     public boolean isUserExists(String login, String password);
 }

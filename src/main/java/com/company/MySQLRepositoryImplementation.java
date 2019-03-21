@@ -7,7 +7,13 @@ import com.google.gson.Gson;
 import java.sql.*;
 
 public class MySQLRepositoryImplementation implements Repository{
-    private static final String URL = "jdbc:mysql://localhost:3306";
+    private static final String  URL = "jdbc:mysql://localhost:3306"+
+            "?verifyServerCertificate=false"+
+            "&useSSL=false"+
+            "&requireSSL=false"+
+            "&useLegacyDatetimeCode=false"+
+            "&amp"+
+            "&serverTimezone=UTC";;
     private static final String USERNAME = "root";
     private static final String PASSWORD = "kazan13m";
     private static Connection connection;
@@ -173,11 +179,11 @@ public class MySQLRepositoryImplementation implements Repository{
 
 
     @Override
-    public String goodList() {
+    public String getAllGoods() {
         Gson gson = new Gson();
         Good good = new Good();
 
-        Statement statement = null;
+        Statement statement;
         try {
             statement = connection.createStatement();
             statement.executeUpdate("use db");
